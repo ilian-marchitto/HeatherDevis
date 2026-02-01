@@ -1,0 +1,52 @@
+-- 1. Table Utilisateurs
+CREATE TABLE utilisateurs (
+    idUtilisateurs INT AUTO_INCREMENT PRIMARY KEY,
+    prenom VARCHAR(100) NOT NULL,
+    nom VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    adresse TEXT NOT NULL,
+    numeroSiret VARCHAR(14) NOT NULL -- VARCHAR car un SIRET commence parfois par 0
+);
+
+-- 2. Table Clients
+CREATE TABLE clients (
+    idClients INT AUTO_INCREMENT PRIMARY KEY,
+    prenom VARCHAR(100) NOT NULL,
+    nom VARCHAR(100) NOT NULL,
+    adresse TEXT NOT NULL,
+    date_creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 3. Table Chantiers
+CREATE TABLE chantiers (
+    idChantiers INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(255) NOT NULL,
+    adresse TEXT NOT NULL,
+    idClient INT NOT NULL,
+    idUtilisateurs INT NOT NULL,
+    date_creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_chantiers_clients FOREIGN KEY (idClient) REFERENCES clients(idClients) ON DELETE CASCADE,
+    CONSTRAINT fk_chantiers_utilisateurs FOREIGN KEY (idUtilisateurs) REFERENCES utilisateurs(idUtilisateurs) ON DELETE CASCADE
+);
+
+-- 4. Table Devis
+CREATE TABLE devis (
+    idDevis INT AUTO_INCREMENT PRIMARY KEY,
+    numeroDevis VARCHAR(50) NOT NULL,
+    idChantier INT NOT NULL,
+    CONSTRAINT fk_devis_chantiers FOREIGN KEY (idChantier) REFERENCES chantiers(idChantiers) ON DELETE CASCADE
+);
+
+-- 5. Table Produits (Lignes du devis)
+CREATE TABLE produits (
+    idProduits INT AUTO_INCREMENT PRIMARY KEY,
+    libelle VARCHAR(255) NOT NULL,
+    quantite DECIMAL(10, 2) NOT NULL,
+    tva DECIMAL(5, 2) NOT NULL,
+    prixUniteHT DECIMAL(10, 2) NOT NULL,
+    idDevis INT NOT NULL,
+    CONSTRAINT fk_produits_devis FOREIGN KEY (idDevis) REFERENCES devis(idDevis) ON DELETE CASCADE
+);
